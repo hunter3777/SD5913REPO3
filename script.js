@@ -8,6 +8,11 @@ const ROOF_AREA = {
 };
 const ROOF_START_RADIUS = 40;
 const ROOF_ANCHOR = { x: 380, y: 174 };
+const SOUND_ORIGIN = { x: 358, y: 350 };
+const RAY_COUNT = 20;
+const RAY_MIN_ANGLE = -72;
+const RAY_MAX_ANGLE = -12;
+const SOUND_TEST_DURATION = 1200;
 
 const canvas = document.getElementById("game-canvas");
 
@@ -33,10 +38,14 @@ const colors = {
   seatFill: "#f6f8f9",
   source: "#2879a8",
   roof: "#2879a8",
+  soundRay: "#168fb2",
 };
 
 const roofPoints = [];
+let soundRays = [];
 let activePointerId = null;
+let soundTestAnimationFrame = null;
+let soundTestProgress = 1;
 
 function drawBackground() {
   context.fillStyle = colors.background;
@@ -234,6 +243,7 @@ function drawTheatreScene() {
   drawAudienceSeats();
   drawRoofMarkers();
   drawRoof();
+  drawSoundRays(soundTestProgress);
 }
 
 function drawRoof() {
@@ -259,6 +269,268 @@ function drawRoof() {
 
   context.stroke();
   context.restore();
+}
+
+function crossProduct(first, second) {
+  return first.x * second.y - first.y * second.x;
+}
+
+function subtractVectors(first, second) {
+  return { x: first.x - second.x, y: first.y - second.y };
+}
+
+function addScaledVector(origin, direction, distance) {
+  return {
+    x: origin.x + direction.x * distance,
+    y: origin.y + direction.y * distance,
+  };
+}
+
+function normalizeVector(vector) {
+  const magnitude = Math.hypot(vector.x, vector.y);
+
+  if (!Number.isFinite(magnitude) || magnitude === 0) {
+    return null;
+  }
+
+  return { x: vector.x / magnitude, y: vector.y / magnitude };
+}
+
+function isFinitePoint(point) {
+  return Boolean(
+    point &&
+    Number.isFinite(point.x) &&
+    Number.isFinite(point.y)
+  );
+}
+
+function findRaySegmentIntersection(origin, direction, segmentStart, segmentEnd) {
+  const segment = subtractVectors(segmentEnd, segmentStart);
+  const originToSegment = subtractVectors(segmentStart, origin);
+  const denominator = crossProduct(direction, segment);
+
+  if (Math.abs(denominator) < 1e-8) {
+    return null;
+  }
+
+  // Solve origin + t * direction = segmentStart + u * segment. A hit is valid
+  // only in front of the ray (t >= 0) and along the roof segment (0 <= u <= 1).
+  const distance = crossProduct(originToSegment, segment) / denominator;
+  const segmentPosition = crossProduct(originToSegment, direction) / denominator;
+
+  if (
+    !Number.isFinite(distance) ||
+    !Number.isFinite(segmentPosition) ||
+    distance < 0 ||
+    segmentPosition < 0 ||
+    segmentPosition > 1
+  ) {
+    return null;
+  }
+
+  const normal = normalizeVector({ x: -segment.y, y: segment.x });
+
+  if (!normal) {
+    return null;
+  }
+
+  return {
+    distance,
+    point: addScaledVector(origin, direction, distance),
+    normal,
+  };
+}
+
+function reflectVector(direction, normal) {
+  // Reflection is d - 2(d · n)n, where n is the unit surface normal.
+  const projection = direction.x * normal.x + direction.y * normal.y;
+  return normalizeVector({
+    x: direction.x - 2 * projection * normal.x,
+    y: direction.y - 2 * projection * normal.y,
+  });
+}
+
+function findFirstRoofIntersection(origin, direction) {
+  let closestHit = null;
+
+  for (let index = 0; index < roofPoints.length - 1; index += 1) {
+    const segmentStart = roofPoints[index];
+    const segmentEnd = roofPoints[index + 1];
+
+    if (!isFinitePoint(segmentStart) || !isFinitePoint(segmentEnd)) {
+      continue;
+    }
+
+    const hit = findRaySegmentIntersection(origin, direction, segmentStart, segmentEnd);
+
+    if (hit && (!closestHit || hit.distance < closestHit.distance)) {
+      closestHit = hit;
+    }
+  }
+
+  return closestHit;
+}
+
+function findRaySceneExit(origin, direction) {
+  const distances = [];
+
+  if (direction.x > 0) {
+    distances.push((SCENE_WIDTH - origin.x) / direction.x);
+  } else if (direction.x < 0) {
+    distances.push((0 - origin.x) / direction.x);
+  }
+
+  if (direction.y > 0) {
+    distances.push((SCENE_HEIGHT - origin.y) / direction.y);
+  } else if (direction.y < 0) {
+    distances.push((0 - origin.y) / direction.y);
+  }
+
+  const positiveDistances = distances.filter((distance) => Number.isFinite(distance) && distance >= 0);
+  const exitDistance = Math.min(...positiveDistances);
+
+  if (!Number.isFinite(exitDistance)) {
+    return origin;
+  }
+
+  return addScaledVector(origin, direction, exitDistance);
+}
+
+function createSoundRays() {
+  const hasValidRoof = (
+    roofPoints.length >= 2 &&
+    !roofPoints.some((point) => !isFinitePoint(point)) &&
+    !roofPoints.some((point, index) => (
+      index > 0 &&
+      Math.hypot(point.x - roofPoints[index - 1].x, point.y - roofPoints[index - 1].y) < 1e-6
+    ))
+  );
+
+  const rays = [];
+
+  for (let index = 0; index < RAY_COUNT; index += 1) {
+    const fraction = index / (RAY_COUNT - 1);
+    const angle = (RAY_MIN_ANGLE + (RAY_MAX_ANGLE - RAY_MIN_ANGLE) * fraction) * (Math.PI / 180);
+    const direction = normalizeVector({ x: Math.cos(angle), y: Math.sin(angle) });
+
+    if (!direction) {
+      continue;
+    }
+
+    const hit = hasValidRoof ? findFirstRoofIntersection(SOUND_ORIGIN, direction) : null;
+
+    if (!hit) {
+      rays.push({
+        incoming: [SOUND_ORIGIN, findRaySceneExit(SOUND_ORIGIN, direction)],
+        reflected: null,
+        isReflected: false,
+      });
+      continue;
+    }
+
+    const reflectedDirection = reflectVector(direction, hit.normal);
+    const reflectedEnd = reflectedDirection
+      ? findRaySceneExit(hit.point, reflectedDirection)
+      : hit.point;
+
+    rays.push({
+      incoming: [SOUND_ORIGIN, hit.point],
+      reflected: reflectedDirection ? [hit.point, reflectedEnd] : null,
+      isReflected: Boolean(reflectedDirection),
+    });
+  }
+
+  return rays;
+}
+
+function drawRayPath(points, progress) {
+  if (!points || points.length < 2 || progress <= 0) {
+    return;
+  }
+
+  const [start, end] = points;
+  const visibleEnd = {
+    x: start.x + (end.x - start.x) * progress,
+    y: start.y + (end.y - start.y) * progress,
+  };
+
+  context.beginPath();
+  context.moveTo(start.x, start.y);
+  context.lineTo(visibleEnd.x, visibleEnd.y);
+  context.stroke();
+}
+
+function drawSoundRays(progress) {
+  if (soundRays.length === 0) {
+    return;
+  }
+
+  context.save();
+  context.strokeStyle = colors.soundRay;
+  context.lineWidth = 1.5;
+  context.lineCap = "round";
+  context.globalAlpha = 0.78;
+
+  for (const ray of soundRays) {
+    drawRayPath(ray.incoming, progress);
+
+    if (ray.isReflected && ray.reflected) {
+      drawRayPath(ray.reflected, Math.max(0, progress - 0.38) / 0.62);
+    }
+  }
+
+  context.restore();
+}
+
+function stopSoundTest() {
+  if (soundTestAnimationFrame !== null) {
+    cancelAnimationFrame(soundTestAnimationFrame);
+    soundTestAnimationFrame = null;
+  }
+
+  canvas.dataset.soundTestRunning = "false";
+}
+
+function runSoundTest() {
+  if (isSoundTestRunning()) {
+    return;
+  }
+
+  stopSoundTest();
+  finishRoofDrawing();
+  soundRays = createSoundRays();
+  soundTestProgress = 0;
+  canvas.dataset.soundTestRunning = "true";
+
+  if (soundRays.length === 0) {
+    soundTestProgress = 1;
+    canvas.dataset.soundTestRunning = "false";
+    drawTheatreScene();
+    return;
+  }
+
+  if (document.hidden) {
+    soundTestProgress = 1;
+    canvas.dataset.soundTestRunning = "false";
+    drawTheatreScene();
+    return;
+  }
+
+  const startedAt = performance.now();
+
+  function animateSoundRays(timestamp) {
+    soundTestProgress = Math.min(1, (timestamp - startedAt) / SOUND_TEST_DURATION);
+    drawTheatreScene();
+
+    if (soundTestProgress < 1) {
+      soundTestAnimationFrame = requestAnimationFrame(animateSoundRays);
+    } else {
+      soundTestAnimationFrame = null;
+      canvas.dataset.soundTestRunning = "false";
+    }
+  }
+
+  soundTestAnimationFrame = requestAnimationFrame(animateSoundRays);
 }
 
 function getCanvasPoint(event) {
@@ -318,6 +590,8 @@ canvas.addEventListener("pointerdown", (event) => {
     return;
   }
 
+  soundRays = [];
+  soundTestProgress = 1;
   activePointerId = event.pointerId;
   roofPoints.length = 0;
   roofPoints.push({ ...ROOF_ANCHOR });
@@ -375,6 +649,14 @@ canvas.addEventListener("contextmenu", (event) => {
   event.preventDefault();
 });
 
+const testSoundButton = document.getElementById("test-sound-button");
+
+if (!(testSoundButton instanceof HTMLButtonElement)) {
+  throw new Error('Echo Architect requires a button with id "test-sound-button".');
+}
+
+testSoundButton.addEventListener("click", runSoundTest);
+
 const resetButton = document.getElementById("reset-button");
 
 if (!(resetButton instanceof HTMLButtonElement)) {
@@ -383,6 +665,9 @@ if (!(resetButton instanceof HTMLButtonElement)) {
 
 resetButton.addEventListener("click", () => {
   finishRoofDrawing();
+  stopSoundTest();
+  soundRays = [];
+  soundTestProgress = 1;
   roofPoints.length = 0;
   drawTheatreScene();
 });
