@@ -53,17 +53,22 @@ let activePointerId = null;
 let soundTestAnimationFrame = null;
 let soundTestProgress = 1;
 let coveredSeatCount = 0;
+let warningTimeout = null;
 
 const coveredCountOutput = document.getElementById("covered-count");
 const totalCountOutput = document.getElementById("total-count");
 const coveragePercentOutput = document.getElementById("coverage-percent");
+const gameWarning = document.getElementById("game-warning");
+const testSoundButton = document.getElementById("test-sound-button");
 
 if (
   !(coveredCountOutput instanceof HTMLOutputElement) ||
   !(totalCountOutput instanceof HTMLOutputElement) ||
-  !(coveragePercentOutput instanceof HTMLOutputElement)
+  !(coveragePercentOutput instanceof HTMLOutputElement) ||
+  !(gameWarning instanceof HTMLParagraphElement) ||
+  !(testSoundButton instanceof HTMLButtonElement)
 ) {
-  throw new Error("Echo Architect requires all three audience coverage output elements.");
+  throw new Error("Echo Architect is missing a required score display or game control.");
 }
 
 function drawBackground() {
@@ -426,8 +431,8 @@ function findRaySceneExit(origin, direction) {
   return addScaledVector(origin, direction, exitDistance);
 }
 
-function createSoundRays() {
-  const hasValidRoof = (
+function isValidRoofDrawing() {
+  return (
     roofPoints.length >= 2 &&
     !roofPoints.some((point) => !isFinitePoint(point)) &&
     !roofPoints.some((point, index) => (
@@ -435,6 +440,10 @@ function createSoundRays() {
       Math.hypot(point.x - roofPoints[index - 1].x, point.y - roofPoints[index - 1].y) < 1e-6
     ))
   );
+}
+
+function createSoundRays() {
+  const hasValidRoof = isValidRoofDrawing();
 
   const rays = [];
 
@@ -553,21 +562,66 @@ function calculateSeatCoverage(rays) {
   };
 }
 
-function showScoreResult() {
+function showScoreResult(percentage) {
   const successDialog = document.getElementById("success-popup");
   const failureDialog = document.getElementById("failure-popup");
+  const successCoverage = document.getElementById("success-coverage");
+  const failureCoverage = document.getElementById("failure-coverage");
+  const successMessage = document.getElementById("success-message");
+  const failureMessage = document.getElementById("failure-message");
 
-  if (!(successDialog instanceof HTMLDialogElement) || !(failureDialog instanceof HTMLDialogElement)) {
-    throw new Error("Echo Architect requires success and failure dialog elements.");
+  if (
+    !(successDialog instanceof HTMLDialogElement) ||
+    !(failureDialog instanceof HTMLDialogElement) ||
+    !(successCoverage instanceof HTMLOutputElement) ||
+    !(failureCoverage instanceof HTMLOutputElement) ||
+    !(successMessage instanceof HTMLParagraphElement) ||
+    !(failureMessage instanceof HTMLParagraphElement)
+  ) {
+    throw new Error("Echo Architect requires complete success and failure dialogs.");
   }
 
-  const didSucceed = audienceSeats.length > 0 &&
-    (coveredSeatCount / audienceSeats.length) * 100 >= SUCCESS_COVERAGE_PERCENT;
+  const displayedPercentage = `${Math.round(percentage)}%`;
+  successCoverage.value = displayedPercentage;
+  failureCoverage.value = displayedPercentage;
+
+  const didSucceed = percentage >= SUCCESS_COVERAGE_PERCENT;
+  successMessage.textContent = `Your roof carries sound to ${displayedPercentage} of the audience, meeting the ${SUCCESS_COVERAGE_PERCENT}% target.`;
+  failureMessage.textContent = `Your roof covered ${displayedPercentage} of the audience. Redesign the roof to direct more sound toward the seats.`;
   const resultDialog = didSucceed ? successDialog : failureDialog;
 
   if (!resultDialog.open) {
     resultDialog.showModal();
   }
+}
+
+function showRoofWarning() {
+  gameWarning.textContent = "Draw a complete roof from the START marker before testing the sound.";
+  gameWarning.hidden = false;
+
+  if (warningTimeout !== null) {
+    clearTimeout(warningTimeout);
+  }
+
+  warningTimeout = window.setTimeout(() => {
+    gameWarning.hidden = true;
+    warningTimeout = null;
+  }, 4000);
+}
+
+function clearRoofWarning() {
+  if (warningTimeout !== null) {
+    clearTimeout(warningTimeout);
+    warningTimeout = null;
+  }
+
+  gameWarning.textContent = "";
+  gameWarning.hidden = true;
+}
+
+function setSoundTestRunning(running) {
+  canvas.dataset.soundTestRunning = String(running);
+  testSoundButton.disabled = running;
 }
 
 function drawRayPath(points, progress) {
@@ -615,7 +669,17 @@ function stopSoundTest() {
     soundTestAnimationFrame = null;
   }
 
-  canvas.dataset.soundTestRunning = "false";
+  setSoundTestRunning(false);
+}
+
+function finishSoundTest() {
+  soundTestAnimationFrame = null;
+  soundTestProgress = 1;
+  setSoundTestRunning(false);
+
+  const score = calculateSeatCoverage(soundRays);
+  drawTheatreScene();
+  showScoreResult(score.percentage);
 }
 
 function runSoundTest() {
@@ -623,25 +687,26 @@ function runSoundTest() {
     return;
   }
 
+  if (!isValidRoofDrawing()) {
+    showRoofWarning();
+    return;
+  }
+
+  clearRoofWarning();
   stopSoundTest();
   finishRoofDrawing();
   soundRays = createSoundRays();
-  calculateSeatCoverage(soundRays);
+  resetSeatCoverage();
   soundTestProgress = 0;
-  canvas.dataset.soundTestRunning = "true";
+  setSoundTestRunning(true);
 
   if (soundRays.length === 0) {
-    soundTestProgress = 1;
-    canvas.dataset.soundTestRunning = "false";
-    drawTheatreScene();
+    finishSoundTest();
     return;
   }
 
   if (document.hidden) {
-    soundTestProgress = 1;
-    canvas.dataset.soundTestRunning = "false";
-    drawTheatreScene();
-    showScoreResult();
+    finishSoundTest();
     return;
   }
 
@@ -654,9 +719,7 @@ function runSoundTest() {
     if (soundTestProgress < 1) {
       soundTestAnimationFrame = requestAnimationFrame(animateSoundRays);
     } else {
-      soundTestAnimationFrame = null;
-      canvas.dataset.soundTestRunning = "false";
-      showScoreResult();
+      finishSoundTest();
     }
   }
 
@@ -720,6 +783,7 @@ canvas.addEventListener("pointerdown", (event) => {
     return;
   }
 
+  clearRoofWarning();
   soundRays = [];
   soundTestProgress = 1;
   resetSeatCoverage();
@@ -780,12 +844,6 @@ canvas.addEventListener("contextmenu", (event) => {
   event.preventDefault();
 });
 
-const testSoundButton = document.getElementById("test-sound-button");
-
-if (!(testSoundButton instanceof HTMLButtonElement)) {
-  throw new Error('Echo Architect requires a button with id "test-sound-button".');
-}
-
 testSoundButton.addEventListener("click", runSoundTest);
 
 const resetButton = document.getElementById("reset-button");
@@ -797,6 +855,7 @@ if (!(resetButton instanceof HTMLButtonElement)) {
 resetButton.addEventListener("click", () => {
   finishRoofDrawing();
   stopSoundTest();
+  clearRoofWarning();
   soundRays = [];
   soundTestProgress = 1;
   roofPoints.length = 0;
@@ -819,12 +878,7 @@ if (!(playAgainButton instanceof HTMLButtonElement) || !(retryButton instanceof 
 }
 
 playAgainButton.addEventListener("click", () => resetButton.click());
-retryButton.addEventListener("click", () => {
-  const failureDialog = document.getElementById("failure-popup");
-  if (failureDialog instanceof HTMLDialogElement && failureDialog.open) {
-    failureDialog.close();
-  }
-});
+retryButton.addEventListener("click", () => resetButton.click());
 
 resetSeatCoverage();
 drawTheatreScene();

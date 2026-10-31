@@ -58,6 +58,14 @@ button:active {
   background: #174e70;
 }
 
+button:disabled,
+button:disabled:hover {
+  border-color: #9aa4ab;
+  background: #9aa4ab;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
 .game {
   width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
@@ -181,6 +189,27 @@ h1 {
   font-size: 0.78rem;
 }
 
+.result-summary {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.game-warning {
+  margin: 0;
+  padding: 7px 10px;
+  border-left: 3px solid var(--focus);
+  background: #fff7eb;
+  color: #70480e;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.game-warning[hidden] {
+  display: none;
+}
+
 dialog {
   width: min(440px, calc(100% - 32px));
   max-width: none;
@@ -215,6 +244,14 @@ dialog::backdrop {
   line-height: 1.6;
 }
 
+.popup-content .modal-coverage {
+  margin: -10px 0 24px;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 640px) {
   .game {
     width: min(100% - 28px, 520px);
@@ -246,6 +283,10 @@ dialog::backdrop {
 
   .coverage {
     text-align: left;
+  }
+
+  .result-summary {
+    align-items: flex-start;
   }
 
   .popup-content {

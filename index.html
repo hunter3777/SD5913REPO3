@@ -37,14 +37,17 @@
           <button type="button" id="reset-button" class="secondary-button">RESET</button>
         </div>
 
-        <p class="coverage" aria-live="polite">
-          Audience seats covered:
-          <output id="covered-count" for="game-canvas">0</output>
-          <span aria-hidden="true">/</span>
-          <output id="total-count" for="game-canvas">0</output>
-          <span class="coverage-percent">(<output id="coverage-percent" for="game-canvas">0%</output>)</span>
-          <span class="coverage-target">Target: 60%</span>
-        </p>
+        <div class="result-summary">
+          <p id="game-warning" class="game-warning" role="status" hidden></p>
+          <p class="coverage" aria-live="polite">
+            Audience seats covered:
+            <output id="covered-count" for="game-canvas">0</output>
+            <span aria-hidden="true">/</span>
+            <output id="total-count" for="game-canvas">0</output>
+            <span class="coverage-percent">(<output id="coverage-percent" for="game-canvas">0%</output>)</span>
+            <span class="coverage-target">Target: 60%</span>
+          </p>
+        </div>
       </div>
     </section>
   </main>
@@ -53,7 +56,8 @@
     <div class="popup-content">
       <p class="eyebrow">DESIGN APPROVED</p>
       <h2 id="success-title">A standing ovation!</h2>
-      <p>Your roof carries sound to enough seats to meet the 60% target.</p>
+      <p id="success-message">Your roof carries sound to enough seats to meet the 60% target.</p>
+      <p class="modal-coverage">Audience coverage: <output id="success-coverage">0%</output></p>
       <button type="button" id="play-again-button">PLAY AGAIN</button>
     </div>
   </dialog>
@@ -62,7 +66,8 @@
     <div class="popup-content">
       <p class="eyebrow">ACOUSTIC CHECK</p>
       <h2 id="failure-title">Not quite there yet</h2>
-      <p>Adjust your roof and give the sound another try.</p>
+      <p id="failure-message">Adjust your roof and give the sound another try.</p>
+      <p class="modal-coverage">Audience coverage: <output id="failure-coverage">0%</output></p>
       <button type="button" id="retry-button">TRY AGAIN</button>
     </div>
   </dialog>
