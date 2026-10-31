@@ -13,6 +13,8 @@ const RAY_COUNT = 20;
 const RAY_MIN_ANGLE = -72;
 const RAY_MAX_ANGLE = -12;
 const SOUND_TEST_DURATION = 1200;
+const SEAT_DETECTION_RADIUS = 18;
+const SUCCESS_COVERAGE_PERCENT = 60;
 
 const canvas = document.getElementById("game-canvas");
 
@@ -36,16 +38,33 @@ const colors = {
   muted: "#87939b",
   lightLine: "#cbd3d9",
   seatFill: "#f6f8f9",
+  seatStroke: "#65727c",
+  coveredSeatFill: "#dcefe3",
+  coveredSeatStroke: "#378252",
   source: "#2879a8",
   roof: "#2879a8",
   soundRay: "#168fb2",
 };
 
 const roofPoints = [];
+const audienceSeats = createAudienceSeats();
 let soundRays = [];
 let activePointerId = null;
 let soundTestAnimationFrame = null;
 let soundTestProgress = 1;
+let coveredSeatCount = 0;
+
+const coveredCountOutput = document.getElementById("covered-count");
+const totalCountOutput = document.getElementById("total-count");
+const coveragePercentOutput = document.getElementById("coverage-percent");
+
+if (
+  !(coveredCountOutput instanceof HTMLOutputElement) ||
+  !(totalCountOutput instanceof HTMLOutputElement) ||
+  !(coveragePercentOutput instanceof HTMLOutputElement)
+) {
+  throw new Error("Echo Architect requires all three audience coverage output elements.");
+}
 
 function drawBackground() {
   context.fillStyle = colors.background;
@@ -147,12 +166,34 @@ function drawAuditoriumFloor() {
   context.stroke();
 }
 
-function drawSeat(x, y) {
+function createAudienceSeats() {
+  const seats = [];
+  const rowCount = 5;
+  const seatsPerRow = 5;
+  const seatSpacing = 102;
+
+  for (let row = 0; row < rowCount; row += 1) {
+    const rowStartX = 400 + row * 22;
+    const rowStartY = 438 - row * 25 - row * 1.3;
+
+    for (let seat = 0; seat < seatsPerRow; seat += 1) {
+      seats.push({
+        x: rowStartX + seat * seatSpacing,
+        y: rowStartY - seat * 8.3,
+        covered: false,
+      });
+    }
+  }
+
+  return seats;
+}
+
+function drawSeat(x, y, covered) {
   context.save();
   context.translate(x, y);
-  context.strokeStyle = colors.ink;
+  context.strokeStyle = covered ? colors.coveredSeatStroke : colors.seatStroke;
   context.lineWidth = 1.5;
-  context.fillStyle = colors.seatFill;
+  context.fillStyle = covered ? colors.coveredSeatFill : colors.seatFill;
 
   context.beginPath();
   context.moveTo(0, 0);
@@ -177,19 +218,8 @@ function drawSeat(x, y) {
 }
 
 function drawAudienceSeats() {
-  const rowCount = 5;
-  const seatsPerRow = 5;
-  const seatSpacing = 102;
-
-  for (let row = 0; row < rowCount; row += 1) {
-    const rowStartX = 400 + row * 22;
-    const rowStartY = 438 - row * 25 - row * 1.3;
-
-    for (let seat = 0; seat < seatsPerRow; seat += 1) {
-      const x = rowStartX + seat * seatSpacing;
-      const y = rowStartY - seat * 8.3;
-      drawSeat(x, y);
-    }
+  for (const seat of audienceSeats) {
+    drawSeat(seat.x, seat.y, seat.covered);
   }
 
   context.fillStyle = colors.muted;
@@ -443,6 +473,103 @@ function createSoundRays() {
   return rays;
 }
 
+function getSeatDetectionPoint(seat) {
+  return { x: seat.x + 9.5, y: seat.y - 8.5 };
+}
+
+function isPointNearSegment(point, segmentStart, segmentEnd, radius) {
+  const segment = subtractVectors(segmentEnd, segmentStart);
+  const lengthSquared = segment.x * segment.x + segment.y * segment.y;
+
+  if (lengthSquared === 0) {
+    return Math.hypot(point.x - segmentStart.x, point.y - segmentStart.y) <= radius;
+  }
+
+  const fromStart = subtractVectors(point, segmentStart);
+  const projection = Math.max(
+    0,
+    Math.min(1, (fromStart.x * segment.x + fromStart.y * segment.y) / lengthSquared)
+  );
+  const closestPoint = addScaledVector(segmentStart, segment, projection);
+
+  return Math.hypot(point.x - closestPoint.x, point.y - closestPoint.y) <= radius;
+}
+
+function isSeatCoveredByReflectedRays(seat, rays) {
+  const detectionPoint = getSeatDetectionPoint(seat);
+
+  return rays.some((ray) => (
+    ray.isReflected &&
+    Array.isArray(ray.reflected) &&
+    ray.reflected.length === 2 &&
+    isFinitePoint(ray.reflected[0]) &&
+    isFinitePoint(ray.reflected[1]) &&
+    isPointNearSegment(
+      detectionPoint,
+      ray.reflected[0],
+      ray.reflected[1],
+      SEAT_DETECTION_RADIUS
+    )
+  ));
+}
+
+function updateCoverageDisplay() {
+  const percentage = audienceSeats.length > 0
+    ? Math.round((coveredSeatCount / audienceSeats.length) * 100)
+    : 0;
+
+  coveredCountOutput.value = String(coveredSeatCount);
+  totalCountOutput.value = String(audienceSeats.length);
+  coveragePercentOutput.value = `${percentage}%`;
+}
+
+function resetSeatCoverage() {
+  coveredSeatCount = 0;
+
+  for (const seat of audienceSeats) {
+    seat.covered = false;
+  }
+
+  updateCoverageDisplay();
+}
+
+function calculateSeatCoverage(rays) {
+  resetSeatCoverage();
+
+  for (const seat of audienceSeats) {
+    if (isSeatCoveredByReflectedRays(seat, rays)) {
+      seat.covered = true;
+      coveredSeatCount += 1;
+    }
+  }
+
+  updateCoverageDisplay();
+  return {
+    covered: coveredSeatCount,
+    total: audienceSeats.length,
+    percentage: audienceSeats.length > 0
+      ? (coveredSeatCount / audienceSeats.length) * 100
+      : 0,
+  };
+}
+
+function showScoreResult() {
+  const successDialog = document.getElementById("success-popup");
+  const failureDialog = document.getElementById("failure-popup");
+
+  if (!(successDialog instanceof HTMLDialogElement) || !(failureDialog instanceof HTMLDialogElement)) {
+    throw new Error("Echo Architect requires success and failure dialog elements.");
+  }
+
+  const didSucceed = audienceSeats.length > 0 &&
+    (coveredSeatCount / audienceSeats.length) * 100 >= SUCCESS_COVERAGE_PERCENT;
+  const resultDialog = didSucceed ? successDialog : failureDialog;
+
+  if (!resultDialog.open) {
+    resultDialog.showModal();
+  }
+}
+
 function drawRayPath(points, progress) {
   if (!points || points.length < 2 || progress <= 0) {
     return;
@@ -499,6 +626,7 @@ function runSoundTest() {
   stopSoundTest();
   finishRoofDrawing();
   soundRays = createSoundRays();
+  calculateSeatCoverage(soundRays);
   soundTestProgress = 0;
   canvas.dataset.soundTestRunning = "true";
 
@@ -513,6 +641,7 @@ function runSoundTest() {
     soundTestProgress = 1;
     canvas.dataset.soundTestRunning = "false";
     drawTheatreScene();
+    showScoreResult();
     return;
   }
 
@@ -527,6 +656,7 @@ function runSoundTest() {
     } else {
       soundTestAnimationFrame = null;
       canvas.dataset.soundTestRunning = "false";
+      showScoreResult();
     }
   }
 
@@ -592,6 +722,7 @@ canvas.addEventListener("pointerdown", (event) => {
 
   soundRays = [];
   soundTestProgress = 1;
+  resetSeatCoverage();
   activePointerId = event.pointerId;
   roofPoints.length = 0;
   roofPoints.push({ ...ROOF_ANCHOR });
@@ -669,7 +800,31 @@ resetButton.addEventListener("click", () => {
   soundRays = [];
   soundTestProgress = 1;
   roofPoints.length = 0;
+  resetSeatCoverage();
+
+  for (const dialog of document.querySelectorAll("dialog")) {
+    if (dialog.open) {
+      dialog.close();
+    }
+  }
+
   drawTheatreScene();
 });
 
+const playAgainButton = document.getElementById("play-again-button");
+const retryButton = document.getElementById("retry-button");
+
+if (!(playAgainButton instanceof HTMLButtonElement) || !(retryButton instanceof HTMLButtonElement)) {
+  throw new Error("Echo Architect requires play-again and retry buttons.");
+}
+
+playAgainButton.addEventListener("click", () => resetButton.click());
+retryButton.addEventListener("click", () => {
+  const failureDialog = document.getElementById("failure-popup");
+  if (failureDialog instanceof HTMLDialogElement && failureDialog.open) {
+    failureDialog.close();
+  }
+});
+
+resetSeatCoverage();
 drawTheatreScene();
