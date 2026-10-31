@@ -118,7 +118,7 @@ h1 {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 5 / 3;
+  aspect-ratio: 25 / 14;
   background-color: #fbfcfc;
   touch-action: none;
 }
