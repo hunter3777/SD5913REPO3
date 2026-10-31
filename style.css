@@ -1,0 +1,254 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #303943;
+  background: #f3f5f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --ink: #303943;
+  --muted: #68737d;
+  --line: #cbd2d8;
+  --paper: #ffffff;
+  --surface: #f3f5f6;
+  --accent: #2879a8;
+  --accent-hover: #1e638c;
+  --focus: #e29a43;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--surface);
+}
+
+button {
+  min-height: 44px;
+  padding: 0.75rem 1.15rem;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  background: var(--accent);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+button:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+button:active {
+  background: #174e70;
+}
+
+.game {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 56px 0 64px;
+}
+
+.game-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 650;
+  letter-spacing: 0.055em;
+  line-height: 1.1;
+}
+
+.instructions {
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.design-panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 8px 26px rgb(34 48 59 / 5%);
+}
+
+.canvas-frame {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #aeb8c0;
+  background: #fbfcfc;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 3;
+  background-color: #fbfcfc;
+  touch-action: none;
+}
+
+.game-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 2px 2px;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.secondary-button {
+  border-color: #8c969e;
+  background: transparent;
+  color: var(--ink);
+}
+
+.secondary-button:hover {
+  border-color: var(--ink);
+  background: #edf0f2;
+  color: var(--ink);
+}
+
+.secondary-button:active {
+  background: #dfe4e7;
+}
+
+.coverage {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.coverage output {
+  color: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.coverage-percent {
+  margin-left: 4px;
+  color: var(--accent);
+}
+
+dialog {
+  width: min(440px, calc(100% - 32px));
+  max-width: none;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 24px 80px rgb(22 33 42 / 22%);
+}
+
+dialog::backdrop {
+  background: rgb(26 36 44 / 54%);
+  backdrop-filter: blur(2px);
+}
+
+.popup-content {
+  padding: 36px;
+  text-align: center;
+}
+
+.popup-content h2 {
+  margin-bottom: 12px;
+  font-size: 1.65rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.popup-content > p:not(.eyebrow) {
+  margin-bottom: 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .game {
+    width: min(100% - 28px, 520px);
+    padding: 36px 0 40px;
+  }
+
+  .game-header {
+    margin-bottom: 24px;
+  }
+
+  .design-panel {
+    padding: 10px;
+  }
+
+  .game-controls {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 14px;
+  }
+
+  .button-group {
+    width: 100%;
+  }
+
+  .button-group button {
+    flex: 1;
+  }
+
+  .coverage {
+    text-align: left;
+  }
+
+  .popup-content {
+    padding: 30px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
