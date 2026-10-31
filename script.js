@@ -1,5 +1,13 @@
 const SCENE_WIDTH = 1000;
 const SCENE_HEIGHT = 560;
+const ROOF_AREA = {
+  left: 380,
+  right: 938,
+  top: 72,
+  bottom: 248,
+};
+const ROOF_START_RADIUS = 40;
+const ROOF_ANCHOR = { x: 380, y: 174 };
 
 const canvas = document.getElementById("game-canvas");
 
@@ -24,7 +32,11 @@ const colors = {
   lightLine: "#cbd3d9",
   seatFill: "#f6f8f9",
   source: "#2879a8",
+  roof: "#2879a8",
 };
+
+const roofPoints = [];
+let activePointerId = null;
 
 function drawBackground() {
   context.fillStyle = colors.background;
@@ -221,6 +233,158 @@ function drawTheatreScene() {
   drawAuditoriumFloor();
   drawAudienceSeats();
   drawRoofMarkers();
+  drawRoof();
 }
+
+function drawRoof() {
+  if (roofPoints.length === 0) {
+    return;
+  }
+
+  context.save();
+  context.strokeStyle = colors.roof;
+  context.lineWidth = 5;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.beginPath();
+  context.moveTo(roofPoints[0].x, roofPoints[0].y);
+
+  for (let index = 1; index < roofPoints.length; index += 1) {
+    context.lineTo(roofPoints[index].x, roofPoints[index].y);
+  }
+
+  if (roofPoints.length === 1) {
+    context.lineTo(roofPoints[0].x + 0.01, roofPoints[0].y);
+  }
+
+  context.stroke();
+  context.restore();
+}
+
+function getCanvasPoint(event) {
+  const bounds = canvas.getBoundingClientRect();
+
+  if (bounds.width === 0 || bounds.height === 0) {
+    return null;
+  }
+
+  return {
+    x: (event.clientX - bounds.left) * (canvas.width / bounds.width),
+    y: (event.clientY - bounds.top) * (canvas.height / bounds.height),
+  };
+}
+
+function isInRoofArea(point) {
+  return (
+    point.x >= ROOF_AREA.left &&
+    point.x <= ROOF_AREA.right &&
+    point.y >= ROOF_AREA.top &&
+    point.y <= ROOF_AREA.bottom
+  );
+}
+
+function isNearRoofAnchor(point) {
+  return Math.hypot(point.x - ROOF_ANCHOR.x, point.y - ROOF_ANCHOR.y) <= ROOF_START_RADIUS;
+}
+
+function isSoundTestRunning() {
+  return canvas.dataset.soundTestRunning === "true";
+}
+
+function finishRoofDrawing() {
+  const pointerId = activePointerId;
+  activePointerId = null;
+
+  if (pointerId !== null && canvas.hasPointerCapture(pointerId)) {
+    canvas.releasePointerCapture(pointerId);
+  }
+}
+
+canvas.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+
+  if (
+    activePointerId !== null ||
+    isSoundTestRunning() ||
+    !event.isPrimary ||
+    event.button !== 0
+  ) {
+    return;
+  }
+
+  const point = getCanvasPoint(event);
+
+  if (!point || !isInRoofArea(point) || !isNearRoofAnchor(point)) {
+    return;
+  }
+
+  activePointerId = event.pointerId;
+  roofPoints.length = 0;
+  roofPoints.push({ ...ROOF_ANCHOR });
+  canvas.setPointerCapture(event.pointerId);
+  drawTheatreScene();
+});
+
+canvas.addEventListener("pointermove", (event) => {
+  if (event.pointerId !== activePointerId) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (isSoundTestRunning()) {
+    finishRoofDrawing();
+    return;
+  }
+
+  const point = getCanvasPoint(event);
+
+  if (!point || !isInRoofArea(point)) {
+    finishRoofDrawing();
+    return;
+  }
+
+  const previousPoint = roofPoints[roofPoints.length - 1];
+
+  if (Math.hypot(point.x - previousPoint.x, point.y - previousPoint.y) >= 1) {
+    roofPoints.push(point);
+    drawTheatreScene();
+  }
+});
+
+canvas.addEventListener("pointerup", (event) => {
+  if (event.pointerId === activePointerId) {
+    event.preventDefault();
+    finishRoofDrawing();
+  }
+});
+
+canvas.addEventListener("pointercancel", (event) => {
+  if (event.pointerId === activePointerId) {
+    finishRoofDrawing();
+  }
+});
+
+canvas.addEventListener("lostpointercapture", (event) => {
+  if (event.pointerId === activePointerId) {
+    finishRoofDrawing();
+  }
+});
+
+canvas.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+});
+
+const resetButton = document.getElementById("reset-button");
+
+if (!(resetButton instanceof HTMLButtonElement)) {
+  throw new Error('Echo Architect requires a button with id "reset-button".');
+}
+
+resetButton.addEventListener("click", () => {
+  finishRoofDrawing();
+  roofPoints.length = 0;
+  drawTheatreScene();
+});
 
 drawTheatreScene();
