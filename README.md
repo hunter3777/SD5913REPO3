@@ -2,30 +2,16 @@
 
 ## 1. Project Overview
 
-Echo Architect is a small browser game about theatre acoustics. Players draw a
-roof over a theatre cross-section and test how sound rays reflect toward the
-audience. The aim is to experiment with the roof design and reach at least 60%
-of the audience seats.
-
-The project uses a simplified 2D model to make the relationship between roof
-shape, reflected sound, and audience coverage visible.
-
-> **Update during development:** Describe any changes to the game concept or
-> purpose in the final version.
+Echo Architect is a small browser game about theatre acoustics. Players draw a roof over a theatre cross-section and test how sound rays reflect toward the audience. The aim is to experiment with the roof design and reach at least 60% of the audience seats.
 
 ## 2. Target Audience
 
-Echo Architect is intended for people who enjoy short, visual design puzzles,
-including students and casual players. No specialist knowledge of architecture
-or acoustics is required to try the game.
+Perhaps someone who shares my love of musical.
 
-> **Add during development:** Specify the intended age range or course audience,
-> and any accessibility needs you considered.
 
 ## 3. How to Play
 
-1. Press and drag from the **START** marker to draw a roof toward the **END**
-   marker.
+1. Press and drag from the **START** marker to draw a roof toward the **END** marker.
 2. Click **TEST SOUND**.
 3. Observe which sound rays hit the roof and reflect into the auditorium.
 4. Check the covered-seat count and coverage percentage. The success target is
@@ -34,9 +20,6 @@ or acoustics is required to try the game.
 
 The game warns you if you test without a valid roof. Roof editing and the test
 button are disabled while a sound simulation is running.
-
-> **Update during development:** Revise these instructions if the final controls
-> or gameplay rules change.
 
 ## 4. Main Interaction
 
@@ -48,8 +31,6 @@ button are disabled while a sound simulation is running.
 | Wait for the simulation to finish | Compares the coverage percentage with the 60% target | A success or failure modal displays the final result |
 | Click **RESET**, **PLAY AGAIN**, or **TRY AGAIN** | Clears the roof, sound rays, and seat coverage | The theatre returns to its initial state |
 
-> **Update during development:** Note any important changes to input, program
-> response, or feedback.
 
 ## 5. Screenshots
 
