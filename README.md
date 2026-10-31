@@ -33,30 +33,21 @@ button are disabled while a sound simulation is running.
 
 
 ## 5. Screenshots
+### Main Game Interface
 
-Add screenshots from the completed game. The paths below are suggested; create
-the `assets/screenshots/` folder and save your images there, or change the paths
-to match your project.
+![Main Game Interface](assets/screenshots/screenshot1.png)
 
-### Main game interface
+### Drawing Simulation
 
-<!-- TODO: Add assets/screenshots/main-game-interface.png. -->
-_Placeholder: the theatre scene, roof markers, and controls._
+![Sound Simulation](assets/screenshots/screenshot2.png)
 
-### Sound simulation
+### Successful Result
 
-<!-- TODO: Add assets/screenshots/sound-simulation.png. -->
-_Placeholder: sound rays travelling through the theatre._
+![Successful Result](assets/screenshots/screenshot3.png)
 
-### Success result
+### Failure Result
 
-<!-- TODO: Add assets/screenshots/success-result.png. -->
-_Placeholder: success modal showing a passing coverage result._
-
-### Failure result
-
-<!-- TODO: Add assets/screenshots/failure-result.png. -->
-_Placeholder: failure modal showing a below-target result._
+![Failure Result](assets/screenshots/screenshot4.png)
 
 ## 6. Technologies
 
