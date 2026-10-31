@@ -779,7 +779,7 @@ canvas.addEventListener("pointerdown", (event) => {
 
   const point = getCanvasPoint(event);
 
-  if (!point || !isInRoofArea(point) || !isNearRoofAnchor(point)) {
+  if (!point || !isNearRoofAnchor(point)) {
     return;
   }
 
@@ -808,8 +808,12 @@ canvas.addEventListener("pointermove", (event) => {
 
   const point = getCanvasPoint(event);
 
-  if (!point || !isInRoofArea(point)) {
+  if (!point || (!isInRoofArea(point) && !isNearRoofAnchor(point))) {
     finishRoofDrawing();
+    return;
+  }
+
+  if (!isInRoofArea(point)) {
     return;
   }
 
