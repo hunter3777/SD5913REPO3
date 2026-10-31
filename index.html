@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#172729">
+  <title>Echo Architect | Theatre Acoustic Design</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="game">
+    <header class="game-header">
+      <p class="eyebrow">THEATRE ACOUSTIC DESIGN</p>
+      <h1>ECHO ARCHITECT</h1>
+      <p class="instructions" id="game-instructions">
+        Draw a theatre roof with your mouse to guide sound across the audience.
+      </p>
+    </header>
+
+    <section class="design-panel" aria-label="Theatre design">
+      <div class="canvas-frame">
+        <canvas
+          id="game-canvas"
+          width="1000"
+          height="600"
+          aria-label="Theatre design area. Draw a roof with your mouse."
+          aria-describedby="game-instructions"
+        >
+          Your browser does not support the canvas element. Please use a modern browser to play Echo Architect.
+        </canvas>
+      </div>
+
+      <div class="game-controls">
+        <div class="button-group" aria-label="Game controls">
+          <button type="button" id="test-sound-button">TEST SOUND</button>
+          <button type="button" id="reset-button" class="secondary-button">RESET</button>
+        </div>
+
+        <p class="coverage" aria-live="polite">
+          Audience seats covered:
+          <output id="covered-count" for="game-canvas">0</output>
+          <span aria-hidden="true">/</span>
+          <output id="total-count" for="game-canvas">0</output>
+          <span class="coverage-percent">(<output id="coverage-percent" for="game-canvas">0%</output>)</span>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="success-popup" aria-labelledby="success-title">
+    <div class="popup-content">
+      <p class="eyebrow">DESIGN APPROVED</p>
+      <h2 id="success-title">A standing ovation!</h2>
+      <p>Your roof carries sound to the whole audience.</p>
+      <button type="button" id="play-again-button">PLAY AGAIN</button>
+    </div>
+  </dialog>
+
+  <dialog id="failure-popup" aria-labelledby="failure-title">
+    <div class="popup-content">
+      <p class="eyebrow">ACOUSTIC CHECK</p>
+      <h2 id="failure-title">Not quite there yet</h2>
+      <p>Adjust your roof and give the sound another try.</p>
+      <button type="button" id="retry-button">TRY AGAIN</button>
+    </div>
+  </dialog>
+</body>
+</html>
