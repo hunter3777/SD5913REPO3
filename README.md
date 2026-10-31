@@ -58,43 +58,17 @@ button are disabled while a sound simulation is running.
 | JavaScript | Handles pointer input, scene drawing, sound-ray calculations, seat scoring, and game results |
 | HTML Canvas 2D | Renders the theatre, roof, seats, and sound rays |
 
-> **Update during development:** Add any libraries or tools only if the final
-> project uses them.
-
 ## 7. How to Run
 
 1. Open the project folder in [Visual Studio Code](https://code.visualstudio.com/).
 2. Confirm that `index.html`, `style.css`, and `script.js` are in the project
    folder.
-3. Install the **Live Server** extension from the VS Code Extensions view if it
-   is not already installed.
-4. Open `index.html` and select **Go Live** in the status bar, or right-click
-   the file and select **Open with Live Server**.
+3. Install the **Live Server** extension from the VS Code Extensions view if it is not already installed.
+4. Open `index.html` and select **Go Live** in the status bar, or right-click the file and select **Open with Live Server**.
 5. Play the game in the browser tab that opens.
-
-> **Update during development:** Add any project-specific setup steps if they
-> become necessary.
 
 ## 8. Known Limitations
 
-- The sound simulation is a simplified two-dimensional model, not a
-  physically accurate acoustic simulation.
-- The game uses a fixed theatre cross-section and a predefined set of audience
-  seats.
+- The sound simulation is a simplified two-dimensional model, not a physically accurate acoustic simulation.
 - The sound test uses 20 rays and a fixed 60% success target.
-
-> **Complete after testing:** Add remaining technical, gameplay, or
-> accessibility limitations that you have confirmed. Remove limitations that
-> no longer apply.
-
-## 9. Credits
-
-Add only sources and assets actually used in the submitted project.
-
-- **Code references:** _Add the title, author, URL, and what you used._
-- **Visual assets:** _Add the asset name, creator, source URL, and licence. If
-  none were used, state that only if accurate._
-- **External resources:** _Add documentation, tutorials, or other resources
-  that informed the work._
-- **AI tools:** _Name any AI tools used and describe their contribution,
-  following your course's acknowledgement requirements._
+- **The victory condition is too easy to achieve. In fact, simply drawing a straight line is enough to reach the goal.**
