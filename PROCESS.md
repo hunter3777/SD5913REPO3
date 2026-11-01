@@ -49,6 +49,7 @@ When a sound test completes, the game compares seat coverage with the 60% target
 | Changed the two-level audience seating to a single level. | The two-level layout blocked too much of the view, making some seats difficult to see. | The new layout makes the seats easier to see and helps players understand which seats are covered by sound. |
 | Changed the drawing interaction from clicking to create connected line segments to dragging the mouse to draw a continuous, irregular line. | The original clicking method made it too easy to complete the challenge. A simple straight line could provide enough sound coverage to pass the level. | The dragging method allows players to create more varied roof shapes. It makes the challenge more difficult and encourages players to experiment with different designs. |
 | Increased the mouse click detection area around the Start point. | During testing, the clickable area was too small. Players had to click very precisely to activate the Start point, which made the interaction frustrating. | After increasing the detection range in the code, players could activate the Start point more easily without needing to click directly on its centre. |
+| Changed the original blue-and-white minimalist line style to a softer, warm pale-yellow colour scheme. | The original blue-and-white design looked a little cold and plain. I wanted to create a warmer and more welcoming visual atmosphere. | The new colour scheme makes the game look softer, more elegant and visually appealing. |
 
 ## 5. User Testing
 
