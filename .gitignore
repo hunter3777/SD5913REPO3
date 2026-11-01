@@ -1,9 +1,20 @@
-# Made from data/ on every run. Commit out/; never commit site/.
-site/
-data/cache/
 
-# Machinery, not work.
-.venv/
-__pycache__/
+# Operating system files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+
+# Temporary files
+*.log
+*.tmp
+
+# Python files (if needed in the future)
+.venv/
+__pycache__/
+*.pyc
+
+# Dependencies (if added in the future)
+node_modules/
