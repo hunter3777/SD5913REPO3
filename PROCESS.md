@@ -2,104 +2,53 @@
 
 ## 1. Starting Idea
 
-The project concept is a theatre acoustic design game inspired by the
-interaction style of Squiggle Drop. Players draw a roof in a theatre
-cross-section and test whether sound can reach the audience.
-
-> **Write in your own words:** Why did you choose this project? What did you
-> hope players would explore or learn? Note any changes you made to the original
-> idea.
+This project started as a small idea I had two years ago, when I wrote down lots of thoughts and ideas about musicals.
+The project concept is a theatre acoustic design game inspired by the interaction style of Squiggle Drop. Players draw a roof in a theatre cross-section and test whether sound can reach the audience.
 
 ## 2. Design Decisions
 
-The current interface has a light architectural style. The theatre cross
-section places the stage and sound source on the left and rows of seats on a
-sloping floor to the right. Markers show where roof drawing starts and ends.
-Players use a mouse or other pointer to draw the roof and click **TEST SOUND**
-to run the simulation.
-
-The game uses a simplified 2D ray model. Seats are covered when a reflected ray
-passes within the detection radius. The success threshold is 60% coverage.
-
-> **Add during development:** Describe the visual and interaction alternatives
-> you considered, why you selected this design, and any gameplay decisions you
-> revised.
+The layout was inspired by architectural section drawings of theatres. These theatres feature uniquely designed roofs to help sound reach as many seats as possible. Thin, straight lines are used to represent sound waves, making the paths of sound reflection clearer.
 
 ## 3. Development Process
 
 ### Project setup
 
-The project is a small static web app, with `index.html`, `style.css`, and
-`script.js` in the project root.
-
-> **Add:** Record how you organised the project, which tools you used, and any
-> setup problems you encountered.
+The project is a small static web app, with `index.html`, `style.css`, and `script.js` in the project root.
 
 ### HTML and CSS interface
 
-The HTML contains the title, instructions, Canvas, controls, coverage display,
-warning, and result dialogs. The CSS provides the architectural styling,
-responsive layout, and button and modal states.
-
-> **Add:** Explain interface decisions and accessibility considerations. Note
-> any changes made after trying the page at different screen sizes.
+The HTML contains the title, instructions, Canvas, controls, coverage display, warning, and result dialogs. The CSS provides the architectural styling, responsive layout, and button and modal states.
 
 ### Canvas theatre drawing
 
 JavaScript draws the theatre in a 1000 by 560 Canvas coordinate system.
-Separate functions draw the background, stage, source, floor, seats, and roof
-markers.
-
-> **Add:** Describe how you organised and refined the drawing code.
+Separate functions draw the background, stage, source, floor, seats, and roof markers.
 
 ### Mouse-based roof drawing
 
-Pointer Events record roof points while the player presses and drags from the
-start marker. Pointer coordinates are converted to Canvas coordinates, and
-drawing is constrained to the roof area.
-
-> **Add:** Record how you tested drawing, resizing, and attempts to draw outside
-> the allowed area, including any issues you fixed.
+Pointer Events record roof points while the player presses and drags from the start marker. Pointer coordinates are converted to Canvas coordinates, and drawing is constrained to the roof area.
+After repeated testing, I found that the mouse-click detection around the **START** marker was not very responsive, so I expanded the clickable area.
 
 ### Sound reflection simulation
 
-The sound test creates 20 rays at different upward angles. It checks each ray
-against the roof segments, finds the first intersection, and calculates a
-reflected direction. A ray that misses the roof continues without reflection.
+The sound test creates 20 rays at different upward angles. It checks each ray against the roof segments, finds the first intersection, and calculates a reflected direction. A ray that misses the roof continues without reflection.
 
-> **Add:** Explain how you checked the intersection and reflection behaviour.
-> Describe the model's simplifications rather than presenting it as physically
-> accurate acoustics.
 
 ### Audience seat detection
 
-Each seat has a Canvas position and a coverage state. The scoring code checks
-whether any reflected ray passes within the seat detection radius. Each seat
-can only count once.
-
-> **Add:** Explain how you chose or tuned the detection radius and how you
-> checked that unreflected rays do not count.
+Each seat has a Canvas position and a coverage state. The scoring code checks whether any reflected ray passes within the seat detection radius. Each seat can only count once.
 
 ### Game result system
 
-When a sound test completes, the game compares seat coverage with the 60%
-target and displays a success or failure modal with the percentage. A warning
-appears if the player tries to test before drawing a valid roof. Restart
-controls clear the roof, rays, and seat states.
-
-> **Add:** Record how you tested both result paths, invalid-roof handling, and
-> restart behaviour.
+When a sound test completes, the game compares seat coverage with the 60% target and displays a success or failure modal with the percentage. A warning appears if the player tries to test before drawing a valid roof. Restart controls clear the roof, rays, and seat states.
 
 ## 4. Design and Code Changes
 
-Use this table to document important changes and why you made them. Add rows
-when needed.
-
 | Change | Reason | Evidence or result |
 | --- | --- | --- |
-| _Describe a change_ | _Why was it needed?_ | _How did you verify it?_ |
-
-> List only changes that were actually made. Mark planned work as planned.
+| Changed the two-level audience seating to a single level. | The two-level layout blocked too much of the view, making some seats difficult to see. | The new layout makes the seats easier to see and helps players understand which seats are covered by sound. |
+| Changed the drawing interaction from clicking to create connected line segments to dragging the mouse to draw a continuous, irregular line. | The original clicking method made it too easy to complete the challenge. A simple straight line could provide enough sound coverage to pass the level. | The dragging method allows players to create more varied roof shapes. It makes the challenge more difficult and encourages players to experiment with different designs. |
+| Increased the mouse click detection area around the Start point. | During testing, the clickable area was too small. Players had to click very precisely to activate the Start point, which made the interaction frustrating. | After increasing the detection range in the code, players could activate the Start point more easily without needing to click directly on its centre. |
 
 ## 5. User Testing
 
@@ -129,22 +78,14 @@ or retained and why. Do not write this as completed work before testing.
 
 ## 7. AI Tools and Assistance
 
-An AI coding assistant in VS Code was used in this development conversation to
-help create and revise project code and documentation. Check your course rules
-and make sure this description matches the assistance you actually used.
-
-- **AI tools used:** _Confirm the tool name and list any others you used._
-- **How each tool was used:** _Describe the specific tasks and what you
-  reviewed or changed._
-- **One AI suggestion I kept:** _Describe a suggestion you actually adopted
-  and why it was useful._
-- **One AI suggestion I modified or rejected:** _Describe a suggestion you
-  actually changed or did not use, and explain why._
-
-> Complete the last two items from your own decisions; do not invent examples.
+- **AI tools used:** Chatgpt, VS Code
+- **How each tool was used:** 
+**Chatgpt:** Help me choose the right tools for different parts of the project. Translate. 
+**VS Code:** Write the code.
 
 ## 8. Reflection
 
-> **Write after development:** What did you learn about Canvas, pointer input,
-> geometry, testing, or software documentation? What was most challenging? What
-> would you improve if you continued developing Echo Architect?
+![art style](assets/Reflection.png)
+Refined the visual style with a more elegant and sophisticated colour palette and overall appearance.
+![sound](assets/Reflection1.png)
+Replace the straight lines representing sound with multiple curved wave lines. Adjust their transparency as they reflect off surfaces, creating a softer, smoother and more dynamic visual effect.
