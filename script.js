@@ -32,18 +32,17 @@ if (!context) {
 }
 
 const colors = {
-  background: "#fbfcfc",
-  wall: "#e9eef1",
-  ink: "#46535d",
-  muted: "#87939b",
-  lightLine: "#cbd3d9",
-  seatFill: "#f6f8f9",
-  seatStroke: "#65727c",
-  coveredSeatFill: "#dcefe3",
-  coveredSeatStroke: "#378252",
-  source: "#2879a8",
-  roof: "#2879a8",
-  soundRay: "#168fb2",
+  background: "#f5f0e6",
+  wall: "#e9e1d4",
+  ink: "#354858",
+  muted: "#77838b",
+  lightLine: "#c8c3b9",
+  seatFill: "#e5e9e8",
+  seatStroke: "#71818a",
+  coveredSeatFill: "#dce7dc",
+  coveredSeatStroke: "#667f6d",
+  source: "#6d8491",
+  roof: "#607c8b",
 };
 
 const roofPoints = [];
@@ -72,31 +71,104 @@ if (
 }
 
 function drawBackground() {
-  context.fillStyle = colors.background;
+  const paper = context.createLinearGradient(0, 0, 0, SCENE_HEIGHT);
+  paper.addColorStop(0, "#faf7f0");
+  paper.addColorStop(1, "#eee8dd");
+  context.fillStyle = paper;
   context.fillRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
 
-  context.fillStyle = colors.wall;
+  const header = context.createLinearGradient(0, 0, 0, 44);
+  header.addColorStop(0, "#eee8dd");
+  header.addColorStop(1, "#e5ded2");
+  context.fillStyle = header;
   context.fillRect(0, 0, SCENE_WIDTH, 42);
 
-  context.strokeStyle = colors.lightLine;
+  context.strokeStyle = "rgba(91, 105, 113, 0.20)";
   context.lineWidth = 1;
   context.beginPath();
   context.moveTo(0, 42.5);
   context.lineTo(SCENE_WIDTH, 42.5);
   context.stroke();
 
-  context.fillStyle = colors.muted;
-  context.font = "600 11px Segoe UI, Arial, sans-serif";
-  context.letterSpacing = "1.5px";
-  context.fillText("THEATRE SECTION", 24, 27);
+  drawAuditoriumArches();
+
+  context.fillStyle = "#63747d";
+  context.font = "600 10px Segoe UI, Arial, sans-serif";
+  context.letterSpacing = "2px";
+  context.fillText("THEATRE  /  ACOUSTIC SECTION", 26, 26);
+}
+
+function drawAuditoriumArches() {
+  context.save();
+
+  const interior = context.createLinearGradient(0, 80, 0, 450);
+  interior.addColorStop(0, "rgba(211, 220, 220, 0.60)");
+  interior.addColorStop(1, "rgba(224, 225, 216, 0.20)");
+  context.fillStyle = interior;
+  context.beginPath();
+  context.moveTo(328, 270);
+  context.lineTo(328, 236);
+  context.bezierCurveTo(328, 116, 442, 58, 640, 58);
+  context.bezierCurveTo(838, 58, 964, 116, 978, 236);
+  context.lineTo(978, 412);
+  context.lineTo(360, 462);
+  context.closePath();
+  context.fill();
+
+  context.strokeStyle = "rgba(83, 103, 113, 0.23)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(312, 274);
+  context.lineTo(312, 235);
+  context.bezierCurveTo(312, 98, 436, 47, 643, 47);
+  context.bezierCurveTo(850, 47, 980, 100, 994, 235);
+  context.stroke();
+
+  context.strokeStyle = "rgba(255, 255, 255, 0.58)";
+  context.lineWidth = 5;
+  context.beginPath();
+  context.moveTo(340, 263);
+  context.lineTo(340, 236);
+  context.bezierCurveTo(340, 126, 450, 72, 641, 72);
+  context.bezierCurveTo(832, 72, 948, 126, 966, 236);
+  context.stroke();
+
+  context.save();
+  context.beginPath();
+  context.moveTo(328, 270);
+  context.lineTo(328, 236);
+  context.bezierCurveTo(328, 116, 442, 58, 640, 58);
+  context.bezierCurveTo(838, 58, 964, 116, 978, 236);
+  context.lineTo(978, 412);
+  context.lineTo(360, 462);
+  context.closePath();
+  context.clip();
+
+  context.strokeStyle = "rgba(112, 128, 132, 0.12)";
+  context.lineWidth = 1;
+  for (let x = 380; x <= 940; x += 38) {
+    context.beginPath();
+    context.moveTo(x, 70);
+    context.lineTo(x, 440);
+    context.stroke();
+  }
+  context.restore();
+
+  context.restore();
 }
 
 function drawStage() {
-  context.fillStyle = "#eef1f3";
-  context.fillRect(0, 332, 320, 126);
+  const stageFace = context.createLinearGradient(0, 330, 0, 458);
+  stageFace.addColorStop(0, "#e5dfd4");
+  stageFace.addColorStop(1, "#d4cbbd");
+  context.fillStyle = stageFace;
+  context.fillRect(24, 332, 296, 114);
 
-  context.strokeStyle = colors.ink;
-  context.lineWidth = 2;
+  context.fillStyle = "rgba(255, 255, 255, 0.28)";
+  context.fillRect(28, 336, 286, 8);
+
+  context.strokeStyle = "#596b75";
+  context.lineWidth = 1.8;
   context.beginPath();
   context.moveTo(24, 332);
   context.lineTo(320, 332);
@@ -104,7 +176,7 @@ function drawStage() {
   context.lineTo(24, 446);
   context.stroke();
 
-  context.strokeStyle = colors.muted;
+  context.strokeStyle = "rgba(79, 97, 106, 0.38)";
   context.lineWidth = 1;
   context.beginPath();
   context.moveTo(24, 350);
@@ -113,18 +185,29 @@ function drawStage() {
   context.lineTo(46, 446);
   context.moveTo(298, 350);
   context.lineTo(298, 446);
+  context.moveTo(60, 350);
+  context.lineTo(60, 410);
+  context.moveTo(284, 350);
+  context.lineTo(284, 410);
   context.stroke();
 
-  context.fillStyle = colors.ink;
-  context.font = "600 12px Segoe UI, Arial, sans-serif";
-  context.letterSpacing = "1px";
-  context.fillText("STAGE", 48, 427);
+  context.fillStyle = "#53656f";
+  context.font = "600 10px Segoe UI, Arial, sans-serif";
+  context.letterSpacing = "2px";
+  context.fillText("STAGE", 62, 426);
 
-  context.strokeStyle = colors.ink;
-  context.lineWidth = 3;
+  context.strokeStyle = "#53656f";
+  context.lineWidth = 2;
   context.beginPath();
   context.moveTo(0, 458);
   context.lineTo(360, 458);
+  context.stroke();
+
+  context.strokeStyle = "rgba(188, 156, 105, 0.68)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(24, 462);
+  context.lineTo(359, 462);
   context.stroke();
 }
 
@@ -132,42 +215,56 @@ function drawSoundSource() {
   const sourceX = 330;
   const sourceY = 350;
 
+  context.save();
   context.strokeStyle = colors.source;
-  context.lineWidth = 2;
+  context.lineWidth = 2.2;
   context.beginPath();
   context.moveTo(sourceX + 14, sourceY - 12);
   context.lineTo(sourceX + 14, sourceY + 12);
   context.lineTo(sourceX + 28, sourceY + 20);
   context.lineTo(sourceX + 28, sourceY - 20);
   context.closePath();
+  context.fillStyle = "rgba(109, 132, 145, 0.10)";
+  context.fill();
   context.stroke();
 
+  context.strokeStyle = "rgba(165, 139, 98, 0.76)";
   context.beginPath();
-  context.arc(sourceX + 28, sourceY, 20, -0.75, 0.75);
+  context.arc(sourceX + 28, sourceY, 19, -0.72, 0.72);
   context.stroke();
+  context.strokeStyle = "rgba(165, 139, 98, 0.40)";
+  context.lineWidth = 1.5;
   context.beginPath();
-  context.arc(sourceX + 28, sourceY, 34, -0.75, 0.75);
+  context.arc(sourceX + 28, sourceY, 31, -0.72, 0.72);
   context.stroke();
 
-  context.fillStyle = colors.source;
-  context.font = "600 10px Segoe UI, Arial, sans-serif";
-  context.letterSpacing = "1px";
+  context.fillStyle = "#73818a";
+  context.font = "600 9px Segoe UI, Arial, sans-serif";
+  context.letterSpacing = "1.5px";
   context.fillText("SOUND SOURCE", sourceX - 20, sourceY + 46);
+  context.restore();
 }
 
 function drawAuditoriumFloor() {
-  context.strokeStyle = colors.ink;
-  context.lineWidth = 2;
+  context.strokeStyle = "#536873";
+  context.lineWidth = 2.2;
   context.beginPath();
   context.moveTo(354, 464);
   context.lineTo(968, 414);
   context.stroke();
 
-  context.strokeStyle = colors.lightLine;
+  context.strokeStyle = "rgba(255, 255, 255, 0.72)";
+  context.lineWidth = 3;
+  context.beginPath();
+  context.moveTo(356, 468);
+  context.lineTo(968, 418);
+  context.stroke();
+
+  context.strokeStyle = "rgba(177, 150, 111, 0.55)";
   context.lineWidth = 1;
   context.beginPath();
-  context.moveTo(354, 470);
-  context.lineTo(968, 420);
+  context.moveTo(354, 474);
+  context.lineTo(968, 424);
   context.stroke();
 }
 
@@ -241,8 +338,8 @@ function drawRoofMarkers() {
   ];
 
   context.save();
-  context.setLineDash([4, 5]);
-  context.strokeStyle = colors.muted;
+  context.setLineDash([3, 6]);
+  context.strokeStyle = "rgba(97, 116, 124, 0.62)";
   context.lineWidth = 1;
 
   for (const marker of markers) {
@@ -254,17 +351,18 @@ function drawRoofMarkers() {
     context.setLineDash([]);
     context.beginPath();
     context.arc(marker.x, markerY, 5, 0, Math.PI * 2);
-    context.fillStyle = colors.background;
+    context.fillStyle = "#f5f0e6";
     context.fill();
-    context.strokeStyle = colors.ink;
+    context.strokeStyle = "#607783";
+    context.lineWidth = 1.5;
     context.stroke();
 
-    context.fillStyle = colors.muted;
+    context.fillStyle = "#687a83";
     context.font = "600 9px Segoe UI, Arial, sans-serif";
-    context.letterSpacing = "1px";
-    context.fillText(marker.label, marker.x - 18, markerY - 13);
-    context.setLineDash([4, 5]);
-    context.strokeStyle = colors.muted;
+    context.letterSpacing = "1.5px";
+    context.fillText(marker.label, marker.x - 19, markerY - 14);
+    context.setLineDash([3, 6]);
+    context.strokeStyle = "rgba(97, 116, 124, 0.62)";
   }
 
   context.restore();
@@ -288,9 +386,12 @@ function drawRoof() {
 
   context.save();
   context.strokeStyle = colors.roof;
-  context.lineWidth = 5;
+  context.lineWidth = 5.5;
   context.lineCap = "round";
   context.lineJoin = "round";
+  context.shadowColor = "rgba(54, 75, 87, 0.20)";
+  context.shadowBlur = 5;
+  context.shadowOffsetY = 2;
   context.beginPath();
   context.moveTo(roofPoints[0].x, roofPoints[0].y);
 
@@ -624,21 +725,83 @@ function setSoundTestRunning(running) {
   testSoundButton.disabled = running;
 }
 
-function drawRayPath(points, progress) {
+function drawRayPath(points, progress, phase = 0, energy = 1) {
   if (!points || points.length < 2 || progress <= 0) {
     return;
   }
 
   const [start, end] = points;
-  const visibleEnd = {
-    x: start.x + (end.x - start.x) * progress,
-    y: start.y + (end.y - start.y) * progress,
-  };
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  const length = Math.hypot(deltaX, deltaY);
 
+  if (length === 0) {
+    return;
+  }
+
+  const visibleLength = length * Math.min(1, progress);
+  const normalX = -deltaY / length;
+  const normalY = deltaX / length;
+  const waveLength = 34;
+  const amplitude = 3.2;
+  const sampleSpacing = 4;
+  const samples = [];
+
+  for (let distance = 0; distance < visibleLength; distance += sampleSpacing) {
+    const fraction = distance / length;
+    const envelope = Math.sin(Math.PI * fraction);
+    const waveOffset = Math.sin((distance / waveLength) * Math.PI * 2 + phase) *
+      amplitude * envelope;
+    samples.push({
+      x: start.x + (deltaX / length) * distance + normalX * waveOffset,
+      y: start.y + (deltaY / length) * distance + normalY * waveOffset,
+    });
+  }
+
+  const endpointFraction = visibleLength / length;
+  const endpointEnvelope = Math.sin(Math.PI * endpointFraction);
+  const endpointOffset = Math.sin((visibleLength / waveLength) * Math.PI * 2 + phase) *
+    amplitude * endpointEnvelope;
+  samples.push({
+    x: start.x + (deltaX / length) * visibleLength + normalX * endpointOffset,
+    y: start.y + (deltaY / length) * visibleLength + normalY * endpointOffset,
+  });
+
+  const visibleStart = samples[0];
+  const visibleEnd = samples[samples.length - 1];
+  const gradient = context.createLinearGradient(
+    visibleStart.x,
+    visibleStart.y,
+    visibleEnd.x,
+    visibleEnd.y
+  );
+  gradient.addColorStop(0, `rgba(195, 161, 107, ${0.62 * energy})`);
+  gradient.addColorStop(0.55, `rgba(195, 161, 107, ${0.34 * energy})`);
+  gradient.addColorStop(1, `rgba(195, 161, 107, ${0.06 * energy})`);
+
+  context.save();
+  context.strokeStyle = gradient;
+  context.lineWidth = 2;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.shadowColor = "rgba(202, 169, 116, 0.32)";
+  context.shadowBlur = 7;
   context.beginPath();
-  context.moveTo(start.x, start.y);
-  context.lineTo(visibleEnd.x, visibleEnd.y);
+  context.moveTo(samples[0].x, samples[0].y);
+
+  for (let index = 1; index < samples.length; index += 1) {
+    const previous = samples[index - 1];
+    const current = samples[index];
+    context.quadraticCurveTo(
+      previous.x + (current.x - previous.x) * 0.5,
+      previous.y + (current.y - previous.y) * 0.5,
+      current.x,
+      current.y
+    );
+  }
+
   context.stroke();
+  context.restore();
 }
 
 function drawSoundRays(progress) {
@@ -646,21 +809,15 @@ function drawSoundRays(progress) {
     return;
   }
 
-  context.save();
-  context.strokeStyle = colors.soundRay;
-  context.lineWidth = 1.5;
-  context.lineCap = "round";
-  context.globalAlpha = 0.78;
-
-  for (const ray of soundRays) {
-    drawRayPath(ray.incoming, progress);
+  for (let index = 0; index < soundRays.length; index += 1) {
+    const ray = soundRays[index];
+    const phase = index * 0.57;
+    drawRayPath(ray.incoming, progress, phase);
 
     if (ray.isReflected && ray.reflected) {
-      drawRayPath(ray.reflected, Math.max(0, progress - 0.38) / 0.62);
+      drawRayPath(ray.reflected, Math.max(0, progress - 0.38) / 0.62, phase + 1.1, 0.58);
     }
   }
-
-  context.restore();
 }
 
 function stopSoundTest() {

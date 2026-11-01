@@ -80,12 +80,10 @@ or retained and why. Do not write this as completed work before testing.
 
 - **AI tools used:** Chatgpt, VS Code
 - **How each tool was used:** 
-**Chatgpt:** Help me choose the right tools for different parts of the project. Translate. 
+**Chatgpt:** Help me choose the right tools for different parts of the project. Translate. Make picture.
 **VS Code:** Write the code.
 
 ## 8. Reflection
 
-![art style](assets/Reflection.png)
-Refined the visual style with a more elegant and sophisticated colour palette and overall appearance.
 ![sound](assets/Reflection1.png)
 Replace the straight lines representing sound with multiple curved wave lines. Adjust their transparency as they reflect off surfaces, creating a softer, smoother and more dynamic visual effect.
