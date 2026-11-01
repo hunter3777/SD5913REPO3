@@ -53,17 +53,11 @@ When a sound test completes, the game compares seat coverage with the 60% target
 
 ## 5. User Testing
 
-Complete this section after a real participant has tried the game. Keep their
-identity anonymous and omit identifying details.
-
-- **Testing participant:** _Use an anonymous label, such as “Participant A”._
-- **What the participant tried:** _Describe the tasks they attempted._
-- **Where they hesitated:** _Record observed hesitation or uncertainty; do not
-  infer it without evidence._
-- **What I observed:** _Record actions and comments accurately._
-- **Problems discovered:** _List problems found during the session._
-- **Testing context:** _Add the date or development stage, device, and browser
-  if relevant._
+- The purpose of the Start point may not be immediately clear.
+- Players may not understand that they need to drag the mouse to draw the roof.
+- The roof drawing area may be unclear.
+- The sound reflection process may be difficult to understand.
+- Players may not understand how the coverage percentage is calculated.
 
 ## 6. AI Tools and Assistance
 
@@ -73,6 +67,9 @@ identity anonymous and omit identifying details.
 **VS Code:** Write the code.
 
 ## 7. Reflection
-
+*Art Style*
 ![sound](assets/Reflection1.png)
-Replace the straight lines representing sound with multiple curved wave lines. Adjust their transparency as they reflect off surfaces, creating a softer, smoother and more dynamic visual effect.
+- Replace the straight lines representing sound with multiple curved wave lines. Adjust their transparency as they reflect off surfaces, creating a softer, smoother and more dynamic visual effect.
+
+*Gameplay*
+- These user testing observations show that I should improve the instructions and visual feedback to make the game easier to understand and more intuitive to play.
