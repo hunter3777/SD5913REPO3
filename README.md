@@ -71,4 +71,4 @@ button are disabled while a sound simulation is running.
 
 - The sound simulation is a simplified two-dimensional model, not a physically accurate acoustic simulation.
 - The sound test uses 20 rays and a fixed 60% success target.
-- **The victory condition is too easy to achieve. In fact, simply drawing a straight line is enough to reach the goal.**
+- **The victory condition is too easy to achieve.**

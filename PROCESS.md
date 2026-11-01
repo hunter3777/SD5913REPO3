@@ -64,26 +64,14 @@ identity anonymous and omit identifying details.
 - **Testing context:** _Add the date or development stage, device, and browser
   if relevant._
 
-## 6. Improvements After Testing
-
-Use actual participant feedback and observations to explain what you changed
-or retained and why. Do not write this as completed work before testing.
-
-| Feedback or observation | Change made or retained | Reason |
-| --- | --- | --- |
-| _Add actual feedback_ | _Describe the change or decision_ | _Explain why_ |
-
-> If testing has not happened yet, leave this as a prompt. If you choose not to
-> act on feedback, explain your reasoning.
-
-## 7. AI Tools and Assistance
+## 6. AI Tools and Assistance
 
 - **AI tools used:** Chatgpt, VS Code
 - **How each tool was used:** 
 **Chatgpt:** Help me choose the right tools for different parts of the project. Translate. Make picture.
 **VS Code:** Write the code.
 
-## 8. Reflection
+## 7. Reflection
 
 ![sound](assets/Reflection1.png)
 Replace the straight lines representing sound with multiple curved wave lines. Adjust their transparency as they reflect off surfaces, creating a softer, smoother and more dynamic visual effect.
